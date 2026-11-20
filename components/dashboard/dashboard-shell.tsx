@@ -44,7 +44,15 @@ function DashboardFrame({ children, footers }: DashboardShellProps) {
             <div className="dashboard-title"><span>Integrated</span> Media Performance</div>
           </div>
           <div className="dashboard-head-actions">
-            <div className="dashboard-period" aria-live="polite">{period || "TV & Digital"}</div>
+            <div className="dashboard-zoom" role="group" aria-label="Pengaturan zoom">
+              <button type="button" aria-label="Perkecil">−</button>
+              <span className="zoom-value flex items-center justify-center">100%</span>
+              <button type="button" aria-label="Perbesar">+</button>
+            </div>
+            <div className="dashboard-period font-mono font-bold flex items-center gap-2 cursor-pointer" aria-live="polite">
+              <span>{pathname === "/ecosystem" ? "Jan – Okt 2026" : (period || "TV & Digital")}</span>
+              <span className="text-[10px] text-zinc-400">▼</span>
+            </div>
             <ThemeToggle />
           </div>
         </header>

@@ -1,26 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { GetEcosystem } from "@/services/api";
 import { DEFAULT_ECOSYSTEM_DATA, type EcosystemDataset } from "@/lib/ecosystem-data";
 
-// Brand and platform SVG Icons
+// --------------------------------------------------------------------------
+// SVG Platform & Brand Icons matching exact broadcast styling
+// --------------------------------------------------------------------------
+
 function InewsLogo() {
   return (
-    <div className="inline-flex flex-col items-center justify-center bg-white px-5 py-2 rounded shadow-md">
-      <div className="flex items-center text-xl font-black tracking-tight text-black">
-        <span className="text-[#c41e3a] font-black">i</span>
+    <div className="inline-flex flex-col items-center justify-center bg-white px-5 py-2 rounded-md shadow-md">
+      <div className="flex items-center text-xl font-black tracking-tight text-black font-sans leading-none">
+        <span className="text-[#c41e3a] font-black mr-0.5">i</span>
         <span className="text-black font-black">News</span>
       </div>
-      <div className="text-[9px] font-extrabold tracking-wider text-black uppercase -mt-1">
+      <div className="text-[9px] font-extrabold tracking-wider text-black uppercase mt-0.5 font-sans">
         MEDIA GROUP
       </div>
     </div>
   );
 }
 
-function InstagramIcon({ size = 20 }: { size?: number }) {
+function InstagramIcon({ size = 22 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <defs>
@@ -40,7 +43,7 @@ function InstagramIcon({ size = 20 }: { size?: number }) {
   );
 }
 
-function FacebookIcon({ size = 20 }: { size?: number }) {
+function FacebookIcon({ size = 22 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="12" r="12" fill="#1877f2" />
@@ -52,7 +55,7 @@ function FacebookIcon({ size = 20 }: { size?: number }) {
   );
 }
 
-function YoutubeIcon({ size = 20 }: { size?: number }) {
+function YoutubeIcon({ size = 22 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <rect width="24" height="24" rx="5" fill="#ff0000" />
@@ -61,7 +64,7 @@ function YoutubeIcon({ size = 20 }: { size?: number }) {
   );
 }
 
-function TvIcon({ size = 20 }: { size?: number }) {
+function TvIcon({ size = 22 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="12" r="12" fill="#0284c7" />
@@ -76,7 +79,7 @@ function TvIcon({ size = 20 }: { size?: number }) {
   );
 }
 
-function PlayOttIcon({ size = 20 }: { size?: number }) {
+function PlayOttIcon({ size = 22 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="12" r="12" fill="#7c3aed" />
@@ -85,7 +88,7 @@ function PlayOttIcon({ size = 20 }: { size?: number }) {
   );
 }
 
-function WebGlobeIcon({ size = 20 }: { size?: number }) {
+function WebGlobeIcon({ size = 22 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="12" r="12" fill="#0891b2" />
@@ -96,16 +99,46 @@ function WebGlobeIcon({ size = 20 }: { size?: number }) {
   );
 }
 
-function TiktokIcon({ size = 20 }: { size?: number }) {
+function TiktokIcon({ size = 22 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="12" fill="#09090b" />
+      <circle cx="12" cy="12" r="12" fill="#000" />
       <path
-        d="M14.5 7.2a3.8 3.8 0 002.3 2.1v2.1a5.8 5.8 0 01-2.4-.7v4.6a3.8 3.8 0 11-3.8-3.8c.3 0 .6 0 .9.1v2.2a1.6 1.6 0 101.3 1.5V6h1.7z"
-        fill="#22c55e"
+        d="M16.5 8.2c-.8-.5-1.4-1.3-1.6-2.2H12.5v11.3a2.4 2.4 0 11-2.4-2.4c.3 0 .6.1.9.2v-2.5a4.8 4.8 0 103.9 4.7V9.7c1.1.8 2.5 1.2 4 1.2V8.5c-.7 0-1.3-.1-1.9-.3z"
+        fill="#25f4ee"
+      />
+      <path
+        d="M16.2 8c-.8-.5-1.4-1.3-1.6-2.2H12.3v11.3a2.4 2.4 0 11-2.4-2.4c.3 0 .6.1.9.2v-2.5a4.8 4.8 0 103.9 4.7V9.5c1.1.8 2.5 1.2 4 1.2V8.3c-.7 0-1.3-.1-1.9-.3z"
+        fill="#fff"
+      />
+      <path
+        d="M16 7.8c-.8-.5-1.4-1.3-1.6-2.2H12.1v11.3a2.4 2.4 0 11-2.4-2.4c.3 0 .6.1.9.2v-2.5a4.8 4.8 0 103.9 4.7V9.3c1.1.8 2.5 1.2 4 1.2V8.1c-.7 0-1.3-.1-1.9-.3z"
+        fill="#fe2c55"
       />
     </svg>
   );
+}
+
+// Catmull-Rom to Cubic Bezier path generator for buttery smooth charts
+function generateSmoothCurve(points: { x: number; y: number }[]): string {
+  if (points.length === 0) return "";
+  if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
+
+  let d = `M ${points[0].x} ${points[0].y}`;
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i === 0 ? 0 : i - 1];
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    const p3 = points[i + 2] || p2;
+
+    const cp1x = p1.x + (p2.x - p0.x) / 5;
+    const cp1y = p1.y + (p2.y - p0.y) / 5;
+    const cp2x = p2.x - (p3.x - p1.x) / 5;
+    const cp2y = p2.y - (p3.y - p1.y) / 5;
+
+    d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+  }
+  return d;
 }
 
 export function EcosystemDashboard() {
@@ -118,41 +151,103 @@ export function EcosystemDashboard() {
   const [selectedMonth, setSelectedMonth] = useState("Oktober 2026");
   const [startMonth, setStartMonth] = useState("Januari");
   const [endMonth, setEndMonth] = useState("Oktober");
+  const [activePlatforms, setActivePlatforms] = useState<string[]>([
+    "TV",
+    "Youtube",
+    "Facebook",
+    "Instagram",
+    "X",
+    "Tiktok",
+  ]);
 
   const monthPerformance =
     data.performanceByMonth[selectedMonth] ||
     data.performanceByMonth["Oktober 2026"] ||
     DEFAULT_ECOSYSTEM_DATA.performanceByMonth["Oktober 2026"];
 
-  const monthList = [
-    "Januari",
-    "Februari",
-    "Maret",
-    "April",
-    "Mei",
-    "Juni",
-    "Juli",
-    "Agustus",
-    "September",
-    "Oktober",
-  ];
+  const monthList = useMemo(
+    () => [
+      "Januari",
+      "Februari",
+      "Maret",
+      "April",
+      "Mei",
+      "Juni",
+      "Juli",
+      "Agustus",
+      "September",
+      "Oktober",
+    ],
+    [],
+  );
 
   const startIndex = Math.max(0, monthList.indexOf(startMonth));
-  const endIndex = Math.min(monthList.length - 1, Math.max(startIndex, monthList.indexOf(endMonth)));
+  const endIndex = Math.min(
+    monthList.length - 1,
+    Math.max(startIndex, monthList.indexOf(endMonth)),
+  );
   const filteredMonths = monthList.slice(startIndex, endIndex + 1);
 
-  const filteredTrenRows = data.trenGabungan.rows.filter((r) =>
-    filteredMonths.includes(r.month),
+  const filteredTrenRows = useMemo(
+    () => data.trenGabungan.rows.filter((r) => filteredMonths.includes(r.month)),
+    [data.trenGabungan.rows, filteredMonths],
   );
+
+  const togglePlatform = (p: string) => {
+    setActivePlatforms((prev) =>
+      prev.includes(p) ? (prev.length > 1 ? prev.filter((item) => item !== p) : prev) : [...prev, p],
+    );
+  };
+
+  const resetAll = () => {
+    setSelectedMonth("Oktober 2026");
+    setStartMonth("Januari");
+    setEndMonth("Oktober");
+    setActivePlatforms(["TV", "Youtube", "Facebook", "Instagram", "X", "Tiktok"]);
+  };
+
+  // Pre-calculate line chart points
+  const chartPoints = useMemo(() => {
+    const n = Math.max(1, filteredTrenRows.length);
+    const chartW = 860;
+    const startX = 50;
+    const stepX = n > 1 ? chartW / (n - 1) : 0;
+
+    const digitalMax = 680;
+    const tvMin = 9.0;
+    const tvMax = 18.4;
+    const topY = 25;
+    const bottomY = 205;
+    const h = bottomY - topY;
+
+    const digitalPts = filteredTrenRows.map((r, i) => {
+      const x = n === 1 ? 480 : startX + i * stepX;
+      const y = bottomY - (r.totalDigital / digitalMax) * h;
+      return { x, y, val: `${r.totalDigital.toFixed(1).replace(".", ",")} Jt` };
+    });
+
+    const tvPts = filteredTrenRows.map((r, i) => {
+      const x = n === 1 ? 480 : startX + i * stepX;
+      const y = bottomY - ((r.tvReach - tvMin) / (tvMax - tvMin)) * h;
+      return { x, y, val: `${r.tvReach.toFixed(1).replace(".", ",")} Jt` };
+    });
+
+    return {
+      digitalPts,
+      tvPts,
+      digitalPath: generateSmoothCurve(digitalPts),
+      tvPath: generateSmoothCurve(tvPts),
+    };
+  }, [filteredTrenRows]);
 
   return (
     <div className="space-y-8 pb-16 font-sans text-white">
       {/* ============================================================== */}
       {/* 1. LAYER 1: TREND ECOSYSTEM                                    */}
       {/* ============================================================== */}
-      <section className="bg-[#181416] border border-[#352c30] rounded-xl p-6 shadow-xl">
+      <section className="bg-[#181416] border border-[#352c30] rounded-xl p-6 shadow-2xl">
         <div className="mb-6">
-          <h2 className="text-2xl font-black tracking-wide font-heading uppercase text-white flex items-center gap-2">
+          <h2 className="text-2xl font-black tracking-wide font-heading uppercase text-white flex items-center gap-3">
             TREND ECOSYSTEM
             <span className="text-sm font-normal text-zinc-400 normal-case tracking-normal">
               Total Reach iNews Media Group per bulan - semua platform
@@ -166,23 +261,22 @@ export function EcosystemDashboard() {
             <InewsLogo />
           </div>
 
-          {/* Bar Chart */}
-          <div className="w-full max-w-4xl h-72 flex items-end justify-between gap-4 px-6 pt-4 pb-2 border-b border-zinc-700/60">
+          {/* Bar Chart Container */}
+          <div className="w-full max-w-4xl h-72 flex items-end justify-between gap-6 px-8 pt-4 pb-2 border-b border-zinc-700/60">
             {data.trendEcosystem.map((item) => {
-              // Scale relative to max reach ~270M
               const maxVal = 280000000;
               const heightPct = Math.round((item.reach / maxVal) * 100);
 
               return (
                 <div key={item.month} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
-                  {/* Value on top of bar */}
+                  {/* Reach value on top */}
                   <span className="text-sm font-mono font-bold text-white tracking-tight">
                     {item.formatted}
                   </span>
                   {/* Blue vertical bar */}
                   <div
                     style={{ height: `${heightPct}%` }}
-                    className="w-full max-w-[90px] bg-[#0b74de] rounded-t-sm transition-all duration-300 hover:brightness-110 shadow-lg"
+                    className="w-full max-w-[85px] bg-[#0078d4] rounded-t-sm transition-all duration-300 hover:brightness-110 shadow-lg"
                   />
                   {/* Month label */}
                   <span className="text-sm font-bold text-zinc-200 mt-2 font-mono">
@@ -194,7 +288,7 @@ export function EcosystemDashboard() {
           </div>
 
           {/* Platform icons row below chart */}
-          <div className="flex items-center justify-center gap-3 mt-4">
+          <div className="flex items-center justify-center gap-3.5 mt-5">
             <InstagramIcon size={24} />
             <FacebookIcon size={24} />
             <YoutubeIcon size={24} />
@@ -204,7 +298,7 @@ export function EcosystemDashboard() {
             <TiktokIcon size={24} />
           </div>
 
-          {/* Bottom Badge */}
+          {/* Period Badge */}
           <div className="mt-5">
             <div className="bg-white text-black px-5 py-1 rounded-md text-xs font-bold font-mono shadow">
               Periode: Mei – Okt 2026
@@ -216,9 +310,9 @@ export function EcosystemDashboard() {
       {/* ============================================================== */}
       {/* 2. LAYER 2: PERFORMANCE ALL PLATFORM                           */}
       {/* ============================================================== */}
-      <section className="bg-[#181416] border border-[#352c30] rounded-xl p-6 shadow-xl">
+      <section className="bg-[#181416] border border-[#352c30] rounded-xl p-6 shadow-2xl">
         <div className="mb-4">
-          <h2 className="text-2xl font-black tracking-wide font-heading uppercase text-white flex items-center gap-2">
+          <h2 className="text-2xl font-black tracking-wide font-heading uppercase text-white flex items-center gap-3">
             PERFORMANCE ALL PLATFORM
             <span className="text-sm font-normal text-zinc-400 normal-case tracking-normal">
               Reach per platform dan posisi iNews Media Group terhadap kompetitor
@@ -226,7 +320,7 @@ export function EcosystemDashboard() {
           </h2>
         </div>
 
-        {/* Blue Rail Filter */}
+        {/* Blue Filter Rail */}
         <div className="bg-[#1e5fa0] rounded-lg p-2.5 px-4 mb-5 flex items-center gap-3 shadow">
           <span className="text-xs font-black tracking-wider uppercase text-white font-heading">
             BULAN
@@ -260,8 +354,8 @@ export function EcosystemDashboard() {
               </div>
             </div>
 
-            {/* Right platform reach icons */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 w-full lg:w-auto">
+            {/* Right 7 platform reach metrics */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-5 w-full lg:w-auto">
               {/* Instagram */}
               <div className="flex flex-col items-center text-center">
                 <InstagramIcon size={28} />
@@ -367,7 +461,7 @@ export function EcosystemDashboard() {
                     <div className="flex-1 bg-transparent h-6 flex items-center">
                       <div
                         style={{ width: `${widthPct}%` }}
-                        className={`h-5 ${isRed ? "bg-[#e0334f]" : "bg-[#0b74de]"} rounded-xs flex items-center justify-end pr-2 transition-all duration-300`}
+                        className={`h-5 ${isRed ? "bg-[#e0334f]" : "bg-[#0b74de]"} rounded-xs flex items-center justify-end pr-2 transition-all duration-300 shadow`}
                       >
                         <span className="text-[11px] font-mono font-bold text-white">
                           {item.formatted}
@@ -403,7 +497,7 @@ export function EcosystemDashboard() {
                     <div className="flex-1 bg-transparent h-6 flex items-center">
                       <div
                         style={{ width: `${widthPct}%` }}
-                        className={`h-5 ${isRed ? "bg-[#e0334f]" : "bg-[#0b74de]"} rounded-xs flex items-center justify-end pr-2 transition-all duration-300`}
+                        className={`h-5 ${isRed ? "bg-[#e0334f]" : "bg-[#0b74de]"} rounded-xs flex items-center justify-end pr-2 transition-all duration-300 shadow`}
                       >
                         <span className="text-[11px] font-mono font-bold text-white">
                           {item.formatted}
@@ -472,30 +566,79 @@ export function EcosystemDashboard() {
         <div className="mt-6 pt-4 border-t border-zinc-800 flex flex-wrap items-center justify-between gap-4 text-xs">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-zinc-400 font-bold uppercase text-[11px] mr-2">PLATFORM</span>
-            <span className="bg-zinc-800 border border-zinc-700 px-3 py-1 rounded-full flex items-center gap-1.5 font-bold">
+            <button
+              type="button"
+              onClick={() => togglePlatform("TV")}
+              className={`border px-3 py-1 rounded-full flex items-center gap-1.5 font-bold transition cursor-pointer ${
+                activePlatforms.includes("TV")
+                  ? "bg-zinc-800 border-zinc-700 text-white"
+                  : "bg-zinc-900 border-zinc-800 text-zinc-500 opacity-60"
+              }`}
+            >
               <span className="w-2 h-2 rounded-full bg-[#e0334f]" /> TV
-            </span>
-            <span className="bg-zinc-800 border border-zinc-700 px-3 py-1 rounded-full flex items-center gap-1.5 font-bold">
+            </button>
+            <button
+              type="button"
+              onClick={() => togglePlatform("Youtube")}
+              className={`border px-3 py-1 rounded-full flex items-center gap-1.5 font-bold transition cursor-pointer ${
+                activePlatforms.includes("Youtube")
+                  ? "bg-zinc-800 border-zinc-700 text-white"
+                  : "bg-zinc-900 border-zinc-800 text-zinc-500 opacity-60"
+              }`}
+            >
               <span className="w-2 h-2 rounded-full bg-[#ff0000]" /> Youtube
-            </span>
-            <span className="bg-zinc-800 border border-zinc-700 px-3 py-1 rounded-full flex items-center gap-1.5 font-bold">
+            </button>
+            <button
+              type="button"
+              onClick={() => togglePlatform("Facebook")}
+              className={`border px-3 py-1 rounded-full flex items-center gap-1.5 font-bold transition cursor-pointer ${
+                activePlatforms.includes("Facebook")
+                  ? "bg-zinc-800 border-zinc-700 text-white"
+                  : "bg-zinc-900 border-zinc-800 text-zinc-500 opacity-60"
+              }`}
+            >
               <span className="w-2 h-2 rounded-full bg-[#1877f2]" /> Facebook
-            </span>
-            <span className="bg-zinc-800 border border-zinc-700 px-3 py-1 rounded-full flex items-center gap-1.5 font-bold">
+            </button>
+            <button
+              type="button"
+              onClick={() => togglePlatform("Instagram")}
+              className={`border px-3 py-1 rounded-full flex items-center gap-1.5 font-bold transition cursor-pointer ${
+                activePlatforms.includes("Instagram")
+                  ? "bg-zinc-800 border-zinc-700 text-white"
+                  : "bg-zinc-900 border-zinc-800 text-zinc-500 opacity-60"
+              }`}
+            >
               <span className="w-2 h-2 rounded-full bg-[#e1306c]" /> Instagram
-            </span>
-            <span className="bg-zinc-800 border border-zinc-700 px-3 py-1 rounded-full flex items-center gap-1.5 font-bold">
+            </button>
+            <button
+              type="button"
+              onClick={() => togglePlatform("X")}
+              className={`border px-3 py-1 rounded-full flex items-center gap-1.5 font-bold transition cursor-pointer ${
+                activePlatforms.includes("X")
+                  ? "bg-zinc-800 border-zinc-700 text-white"
+                  : "bg-zinc-900 border-zinc-800 text-zinc-500 opacity-60"
+              }`}
+            >
               <span className="w-2 h-2 rounded-full bg-white" /> X
-            </span>
-            <span className="bg-zinc-800 border border-zinc-700 px-3 py-1 rounded-full flex items-center gap-1.5 font-bold">
+            </button>
+            <button
+              type="button"
+              onClick={() => togglePlatform("Tiktok")}
+              className={`border px-3 py-1 rounded-full flex items-center gap-1.5 font-bold transition cursor-pointer ${
+                activePlatforms.includes("Tiktok")
+                  ? "bg-zinc-800 border-zinc-700 text-white"
+                  : "bg-zinc-900 border-zinc-800 text-zinc-500 opacity-60"
+              }`}
+            >
               <span className="w-2 h-2 rounded-full bg-white" /> Tiktok
-            </span>
+            </button>
           </div>
           <div className="flex items-center gap-3 text-zinc-400 text-xs">
             <span>Filter bulan ada di setiap panel</span>
             <button
-              onClick={() => setSelectedMonth("Oktober 2026")}
-              className="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 px-3 py-1 rounded font-bold transition"
+              type="button"
+              onClick={resetAll}
+              className="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 px-3 py-1 rounded font-bold transition cursor-pointer"
             >
               Reset semua
             </button>
@@ -506,7 +649,7 @@ export function EcosystemDashboard() {
       {/* ============================================================== */}
       {/* 3. LAYER 3: TREN REACH GABUNGAN                                */}
       {/* ============================================================== */}
-      <section className="bg-[#181416] border border-[#352c30] rounded-xl p-6 shadow-xl">
+      <section className="bg-[#181416] border border-[#352c30] rounded-xl p-6 shadow-2xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
           <h2 className="text-2xl font-black tracking-wide font-heading uppercase text-white">
             TREN REACH GABUNGAN
@@ -518,7 +661,7 @@ export function EcosystemDashboard() {
             <select
               value={startMonth}
               onChange={(e) => setStartMonth(e.target.value)}
-              className="bg-[#241e21] border border-zinc-700 text-white rounded px-2.5 py-1"
+              className="bg-[#241e21] border border-zinc-700 text-white rounded px-2.5 py-1 outline-none"
             >
               {monthList.map((m) => (
                 <option key={m} value={m}>
@@ -530,7 +673,7 @@ export function EcosystemDashboard() {
             <select
               value={endMonth}
               onChange={(e) => setEndMonth(e.target.value)}
-              className="bg-[#241e21] border border-zinc-700 text-white rounded px-2.5 py-1"
+              className="bg-[#241e21] border border-zinc-700 text-white rounded px-2.5 py-1 outline-none"
             >
               {monthList.map((m) => (
                 <option key={m} value={m}>
@@ -577,49 +720,38 @@ export function EcosystemDashboard() {
             Digital Reach + Views
           </div>
 
-          {/* SVG Line Paths */}
+          {/* SVG Smooth Curves & Points */}
           <div className="w-full h-full pl-10 pr-12 pb-6">
-            <svg viewBox="0 0 900 240" className="w-full h-full overflow-visible">
-              {/* Grid Lines */}
-              <line x1="0" y1="20" x2="900" y2="20" stroke="#2c2428" strokeDasharray="3 3" />
-              <line x1="0" y1="80" x2="900" y2="80" stroke="#2c2428" strokeDasharray="3 3" />
-              <line x1="0" y1="140" x2="900" y2="140" stroke="#2c2428" strokeDasharray="3 3" />
-              <line x1="0" y1="200" x2="900" y2="200" stroke="#2c2428" strokeDasharray="3 3" />
+            <svg viewBox="0 0 960 240" className="w-full h-full overflow-visible">
+              {/* Horizontal Grid lines */}
+              <line x1="0" y1="25" x2="960" y2="25" stroke="#2c2428" strokeDasharray="3 3" />
+              <line x1="0" y1="85" x2="960" y2="85" stroke="#2c2428" strokeDasharray="3 3" />
+              <line x1="0" y1="145" x2="960" y2="145" stroke="#2c2428" strokeDasharray="3 3" />
+              <line x1="0" y1="205" x2="960" y2="205" stroke="#2c2428" strokeDasharray="3 3" />
 
-              {/* Digital Green Line (Mapped against 0 to 680M) */}
-              <polyline
+              {/* Digital Smooth Green Curve */}
+              <path
+                d={chartPoints.digitalPath}
                 fill="none"
                 stroke="#22c55e"
                 strokeWidth="3.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                points="45,144 135,142 225,60 315,110 405,130 495,115 585,112 675,120 765,72 855,30"
               />
 
-              {/* TV Red Line (Mapped against 9.0 to 18.4M) */}
-              <polyline
+              {/* TV Smooth Red Curve */}
+              <path
+                d={chartPoints.tvPath}
                 fill="none"
                 stroke="#e0334f"
                 strokeWidth="3.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                points="45,140 135,140 225,116 315,136 405,160 495,150 585,165 675,178 765,165 855,168"
               />
 
-              {/* Dots and Labels for Green Line */}
-              {[
-                { x: 45, y: 144, val: "272,1 Jt" },
-                { x: 135, y: 142, val: "277,2 Jt" },
-                { x: 225, y: 60, val: "472,6 Jt" },
-                { x: 315, y: 110, val: "342,5 Jt" },
-                { x: 405, y: 130, val: "294,6 Jt" },
-                { x: 495, y: 115, val: "330,3 Jt" },
-                { x: 585, y: 112, val: "337,1 Jt" },
-                { x: 675, y: 120, val: "316,4 Jt" },
-                { x: 765, y: 72, val: "438,4 Jt" },
-                { x: 855, y: 30, val: "549,1 Jt" },
-              ].map((pt, i) => (
-                <g key={`g-${i}`}>
+              {/* Digital Green Dots and Labels on top */}
+              {chartPoints.digitalPts.map((pt, i) => (
+                <g key={`d-dot-${i}`}>
                   <circle cx={pt.x} cy={pt.y} r="5" fill="#22c55e" stroke="#fff" strokeWidth="1.5" />
                   <text
                     x={pt.x}
@@ -635,20 +767,9 @@ export function EcosystemDashboard() {
                 </g>
               ))}
 
-              {/* Dots and Labels for Red Line */}
-              {[
-                { x: 45, y: 140, val: "12,6 Jt" },
-                { x: 135, y: 140, val: "12,6 Jt" },
-                { x: 225, y: 116, val: "13,6 Jt" },
-                { x: 315, y: 136, val: "12,8 Jt" },
-                { x: 405, y: 160, val: "11,7 Jt" },
-                { x: 495, y: 150, val: "12,2 Jt" },
-                { x: 585, y: 165, val: "11,5 Jt" },
-                { x: 675, y: 178, val: "10,9 Jt" },
-                { x: 765, y: 165, val: "11,5 Jt" },
-                { x: 855, y: 168, val: "11,4 Jt" },
-              ].map((pt, i) => (
-                <g key={`r-${i}`}>
+              {/* TV Red Dots and Labels below */}
+              {chartPoints.tvPts.map((pt, i) => (
+                <g key={`tv-dot-${i}`}>
                   <circle cx={pt.x} cy={pt.y} r="5" fill="#e0334f" stroke="#fff" strokeWidth="1.5" />
                   <text
                     x={pt.x}
@@ -664,21 +785,24 @@ export function EcosystemDashboard() {
                 </g>
               ))}
 
-              {/* Month X Labels */}
-              {["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt"].map((m, idx) => (
-                <text
-                  key={m}
-                  x={45 + idx * 90}
-                  y="235"
-                  textAnchor="middle"
-                  fill="#d4d4d8"
-                  fontSize="12"
-                  fontWeight="bold"
-                  fontFamily="monospace"
-                >
-                  {m}
-                </text>
-              ))}
+              {/* Month X-Axis Labels */}
+              {filteredTrenRows.map((row, idx) => {
+                const pt = chartPoints.digitalPts[idx];
+                return (
+                  <text
+                    key={row.month}
+                    x={pt?.x || 50}
+                    y="235"
+                    textAnchor="middle"
+                    fill="#d4d4d8"
+                    fontSize="12"
+                    fontWeight="bold"
+                    fontFamily="monospace"
+                  >
+                    {row.month.slice(0, 3)}
+                  </text>
+                );
+              })}
             </svg>
           </div>
         </div>
@@ -720,12 +844,22 @@ export function EcosystemDashboard() {
               {filteredTrenRows.map((row) => (
                 <tr key={row.month} className="hover:bg-[#251f22] transition-colors">
                   <td className="py-2.5 px-4 font-bold text-white">{row.month}</td>
-                  <td className="py-2.5 px-4 text-[#e0334f] font-bold">{row.tvReach.toFixed(1).replace(".", ",")} Jt</td>
-                  <td className="py-2.5 px-4 text-zinc-200">{row.youtube.toFixed(1).replace(".", ",")} Jt</td>
-                  <td className="py-2.5 px-4 text-zinc-200">{row.facebook.toFixed(1).replace(".", ",")} Jt</td>
-                  <td className="py-2.5 px-4 text-zinc-200">{row.instagram.toFixed(1).replace(".", ",")} Jt</td>
+                  <td className="py-2.5 px-4 text-[#e0334f] font-bold">
+                    {row.tvReach.toFixed(1).replace(".", ",")} Jt
+                  </td>
                   <td className="py-2.5 px-4 text-zinc-200">
-                    {row.xViews >= 1 ? `${row.xViews.toFixed(1).replace(".", ",")} Jt` : `${Math.round(row.xViews * 1000)} Rb`}
+                    {row.youtube.toFixed(1).replace(".", ",")} Jt
+                  </td>
+                  <td className="py-2.5 px-4 text-zinc-200">
+                    {row.facebook.toFixed(1).replace(".", ",")} Jt
+                  </td>
+                  <td className="py-2.5 px-4 text-zinc-200">
+                    {row.instagram.toFixed(1).replace(".", ",")} Jt
+                  </td>
+                  <td className="py-2.5 px-4 text-zinc-200">
+                    {row.xViews >= 1
+                      ? `${row.xViews.toFixed(1).replace(".", ",")} Jt`
+                      : `${Math.round(row.xViews * 1000)} Rb`}
                   </td>
                   <td className="py-2.5 px-4 text-[#22c55e] font-bold">
                     {row.totalDigital.toFixed(1).replace(".", ",")} Jt
@@ -768,7 +902,7 @@ export function EcosystemDashboard() {
       {/* ============================================================== */}
       {/* 4. LAYER 4: KOMPOSISI DIGITAL REACH                            */}
       {/* ============================================================== */}
-      <section className="bg-[#181416] border border-[#352c30] rounded-xl p-6 shadow-xl">
+      <section className="bg-[#181416] border border-[#352c30] rounded-xl p-6 shadow-2xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3">
           <div>
             <h2 className="text-2xl font-black tracking-wide font-heading uppercase text-white">
@@ -783,7 +917,7 @@ export function EcosystemDashboard() {
             <select
               value={startMonth}
               onChange={(e) => setStartMonth(e.target.value)}
-              className="bg-[#241e21] border border-zinc-700 text-white rounded px-2.5 py-1"
+              className="bg-[#241e21] border border-zinc-700 text-white rounded px-2.5 py-1 outline-none"
             >
               {monthList.map((m) => (
                 <option key={m} value={m}>
@@ -795,7 +929,7 @@ export function EcosystemDashboard() {
             <select
               value={endMonth}
               onChange={(e) => setEndMonth(e.target.value)}
-              className="bg-[#241e21] border border-zinc-700 text-white rounded px-2.5 py-1"
+              className="bg-[#241e21] border border-zinc-700 text-white rounded px-2.5 py-1 outline-none"
             >
               {monthList.map((m) => (
                 <option key={m} value={m}>
@@ -829,7 +963,7 @@ export function EcosystemDashboard() {
 
         {/* Stacked Bar Chart */}
         <div className="relative w-full h-84 px-10 py-4 bg-[#141012] border border-zinc-800 rounded-lg overflow-hidden">
-          {/* Y Axis */}
+          {/* Y Axis ticks */}
           <div className="absolute left-2 top-4 bottom-10 flex flex-col justify-between text-[11px] font-mono text-zinc-400 text-right pr-2">
             <span>615,0 Jt</span>
             <span>400,0 Jt</span>
@@ -849,38 +983,38 @@ export function EcosystemDashboard() {
 
               return (
                 <div key={row.month} className="flex-1 flex flex-col items-center h-full justify-end group">
-                  {/* Total on top */}
+                  {/* Total reach label on top */}
                   <span className="text-xs font-mono font-bold text-white mb-1.5 whitespace-nowrap">
                     {row.totalDigital.toFixed(1).replace(".", ",")} Jt
                   </span>
 
-                  {/* Stacked Bar Container */}
+                  {/* Stacked Bar (Order: Instagram Top, Facebook Middle, YouTube Bottom) */}
                   <div
                     style={{ height: `${heightPct}%` }}
-                    className="w-full max-w-[65px] rounded-t-sm flex flex-col-reverse overflow-hidden shadow-lg"
+                    className="w-full max-w-[65px] rounded-t-sm flex flex-col overflow-hidden shadow-lg"
                   >
-                    {/* YouTube (Bottom - Red) */}
+                    {/* Instagram (Top - Magenta) */}
                     <div
-                      style={{ height: `${ytPct}%` }}
-                      className="bg-[#e0334f] w-full flex items-center justify-center text-[10px] font-mono font-black text-white hover:brightness-110"
+                      style={{ height: `${igPct}%` }}
+                      className="bg-[#e1306c] w-full flex items-center justify-center text-[10px] font-mono font-bold text-white hover:brightness-110"
                     >
-                      {row.youtube >= 80 ? row.youtube.toFixed(1).replace(".", ",") : ""}
+                      {row.instagram.toFixed(1).replace(".", ",")}
                     </div>
 
                     {/* Facebook (Middle - Blue) */}
                     <div
                       style={{ height: `${fbPct}%` }}
-                      className="bg-[#1877f2] w-full flex items-center justify-center text-[10px] font-mono font-black text-white hover:brightness-110"
+                      className="bg-[#1877f2] w-full flex items-center justify-center text-[10px] font-mono font-bold text-white hover:brightness-110"
                     >
-                      {row.facebook >= 60 ? row.facebook.toFixed(1).replace(".", ",") : ""}
+                      {row.facebook.toFixed(1).replace(".", ",")}
                     </div>
 
-                    {/* Instagram (Top - Magenta) */}
+                    {/* YouTube (Bottom - Red) */}
                     <div
-                      style={{ height: `${igPct}%` }}
-                      className="bg-[#e1306c] w-full flex items-center justify-center text-[10px] font-mono font-black text-white hover:brightness-110"
+                      style={{ height: `${ytPct}%` }}
+                      className="bg-[#e0334f] w-full flex items-center justify-center text-[10px] font-mono font-bold text-white hover:brightness-110"
                     >
-                      {row.instagram >= 50 ? row.instagram.toFixed(1).replace(".", ",") : ""}
+                      {row.youtube.toFixed(1).replace(".", ",")}
                     </div>
                   </div>
 
@@ -898,7 +1032,7 @@ export function EcosystemDashboard() {
       {/* ============================================================== */}
       {/* 5. LAYER 5: PROFIL PENONTON GABUNGAN                           */}
       {/* ============================================================== */}
-      <section className="bg-[#181416] border border-[#352c30] rounded-xl p-6 shadow-xl">
+      <section className="bg-[#181416] border border-[#352c30] rounded-xl p-6 shadow-2xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
           <h2 className="text-2xl font-black tracking-wide font-heading uppercase text-white">
             PROFIL PENONTON GABUNGAN
@@ -910,7 +1044,7 @@ export function EcosystemDashboard() {
             <select
               value={startMonth}
               onChange={(e) => setStartMonth(e.target.value)}
-              className="bg-[#241e21] border border-zinc-700 text-white rounded px-2.5 py-1"
+              className="bg-[#241e21] border border-zinc-700 text-white rounded px-2.5 py-1 outline-none"
             >
               {monthList.map((m) => (
                 <option key={m} value={m}>
@@ -922,7 +1056,7 @@ export function EcosystemDashboard() {
             <select
               value={endMonth}
               onChange={(e) => setEndMonth(e.target.value)}
-              className="bg-[#241e21] border border-zinc-700 text-white rounded px-2.5 py-1"
+              className="bg-[#241e21] border border-zinc-700 text-white rounded px-2.5 py-1 outline-none"
             >
               {monthList.map((m) => (
                 <option key={m} value={m}>
@@ -937,13 +1071,19 @@ export function EcosystemDashboard() {
           Gender & Usia · Jan – Okt 2026 · TV: INEWS (Nielsen) · Digital: Unit iNews · sorot merah = 3 kelompok usia terbesar
         </p>
 
-        {/* 6 Demographic Cards Grid */}
+        {/* 6 Demographic Cards in 3x2 Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {data.profilPenonton.map((card) => {
+            // Determine base bar color for unhighlighted age groups
+            let baseBarColor = "#451820";
+            if (card.platform === "FACEBOOK") baseBarColor = "#1e2f47";
+            else if (card.platform === "INSTAGRAM") baseBarColor = "#3d1a2c";
+            else if (card.platform === "X" || card.platform === "TIKTOK") baseBarColor = "#334155";
+
             return (
               <div
                 key={card.platform}
-                className="bg-[#1c1719] border border-[#352c30] rounded-lg p-5 shadow-md flex flex-col justify-between"
+                className="bg-[#1c1719] border border-[#352c30] rounded-lg p-5 shadow-lg flex flex-col justify-between"
               >
                 <div>
                   {/* Card Header */}
@@ -986,7 +1126,6 @@ export function EcosystemDashboard() {
                     </div>
                     <div className="space-y-2">
                       {card.ageGroups.map((age) => {
-                        // Max age pct ~45%
                         const widthPct = Math.max(3, Math.round((age.pct / 45) * 100));
                         const isTop = age.isTop;
 
@@ -997,7 +1136,7 @@ export function EcosystemDashboard() {
                               <div
                                 style={{
                                   width: `${widthPct}%`,
-                                  backgroundColor: isTop ? "#ff6b8b" : "#4a2832",
+                                  backgroundColor: isTop ? "#ff6b8b" : baseBarColor,
                                 }}
                                 className="h-2 rounded-xs transition-all duration-300 shadow-sm"
                               />
