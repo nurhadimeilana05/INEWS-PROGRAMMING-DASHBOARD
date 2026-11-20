@@ -2,6 +2,7 @@ import type { DataRow } from "@/lib/dashboard-data";
 import type { SheetEndpoint } from "@/lib/spreadsheet-data";
 import type { ContentDataset } from "@/lib/content-data";
 import type { TvDataset } from "@/lib/tv-data";
+import type { EcosystemDataset } from "@/lib/ecosystem-data";
 
 async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
   const response = await fetch(url, {
@@ -29,6 +30,10 @@ export function GetContent(signal?: AbortSignal) {
 
 export function GetDataTv(signal?: AbortSignal) {
   return getJson<TvDataset>("/api/data-tv", signal);
+}
+
+export function GetEcosystem(signal?: AbortSignal) {
+  return getJson<EcosystemDataset>("/api/ecosystem", signal);
 }
 
 export async function GetPerformanceMonthly(signal?: AbortSignal) {

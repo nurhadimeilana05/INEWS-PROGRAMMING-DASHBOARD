@@ -51,7 +51,7 @@ function DashboardFrame({ children, footers }: DashboardShellProps) {
         <Navbar />
       </div>
       <main id="main-content" className="dashboard-layer" tabIndex={-1}>
-        {!pathname.startsWith("/data-tv") && pathname !== "/content" && <FiltersBar />}
+        {!pathname.startsWith("/data-tv") && pathname !== "/content" && pathname !== "/ecosystem" && <FiltersBar />}
         {children}
       </main>
       {footers[pathname]}

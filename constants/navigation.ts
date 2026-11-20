@@ -1,6 +1,11 @@
 export const navigation = [
-  { href: "/data-tv", label: "Data TV", description: "Performa channel dan program TV" },
-  { href: "/content", label: "Content", description: "Topik lintas platform dan kompetitor" },
+  { href: "/ecosystem", label: "ECOSYSTEM", description: "Jangkauan ekosistem media iNews" },
+  { href: "/data-tv", label: "DATA TV", description: "Performa channel dan program TV" },
+  { href: "/content", label: "CONTENT", description: "Topik lintas platform dan kompetitor" },
+  { href: "#revenue", label: "REVENUE", description: "Pendapatan TV & Digital" },
+  { href: "#pola", label: "POLA", description: "Pola acara & RKAT" },
+  { href: "#promo", label: "PROMO", description: "Durasi dan program promo" },
+  { href: "#library", label: "LIBRARY", description: "Master On Air & Master Shoot" },
 ] as const;
 
 export const channels = ["INEWS", "TVONE", "KOMPASTV", "METRO", "GTV", "MDTV", "ANTV", "RCTI", "TRANS", "TRANS7", "IVM", "SCTV", "MNCTV", "RTV", "MENTARI", "MOJI", "SINPO", "GARUDATV", "CNN INDONESIA", "NUSANTARATV"] as const;
