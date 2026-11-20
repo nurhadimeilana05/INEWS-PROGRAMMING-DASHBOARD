@@ -10,8 +10,11 @@ import {
 let client: sheets_v4.Sheets | undefined;
 
 export function GetSheetsClient() {
-  const email = process.env.GOOGLE_CLIENT_EMAIL;
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+  const email = process.env.GOOGLE_CLIENT_EMAIL?.trim();
+  const rawKey = process.env.GOOGLE_PRIVATE_KEY?.trim();
+  const privateKey = rawKey
+    ?.replace(/^["']|["']$/g, "")
+    ?.replace(/\\n/g, "\n");
   if (!email || !privateKey) {
     throw new Error("Konfigurasi Google Sheets belum lengkap.");
   }

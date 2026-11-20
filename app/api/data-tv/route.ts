@@ -1,6 +1,9 @@
 import { connection } from "next/server";
+import { gzipSync } from "node:zlib";
 import { TV_SHEETS, buildTvDataset, resolveTvSheets } from "@/lib/tv-data";
 import { GetSheetsClient, GetSpreadsheetId } from "@/services/google-sheets";
+
+export const maxDuration = 60;
 
 export async function GET() {
   await connection();
@@ -36,7 +39,18 @@ export async function GET() {
         values: response.data.valueRanges?.[index]?.values ?? [],
       })),
     );
-    return Response.json({ ...data, sourceSheets: Object.fromEntries(resolved.map(({ name, title }) => [name, title])) }, { headers: { "Cache-Control": "no-store" } });
+    const body = JSON.stringify({
+      ...data,
+      sourceSheets: Object.fromEntries(resolved.map(({ name, title }) => [name, title])),
+    });
+    const compressed = gzipSync(Buffer.from(body));
+    return new Response(compressed, {
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Encoding": "gzip",
+        "Cache-Control": "no-store",
+      },
+    });
   } catch (error) {
     console.error(
       "Data TV spreadsheet:",

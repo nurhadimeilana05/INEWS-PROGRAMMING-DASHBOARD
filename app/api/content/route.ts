@@ -1,7 +1,9 @@
 import { connection } from "next/server";
+import { gzipSync } from "node:zlib";
 import { CONTENT_SHEETS, buildContentDataset } from "@/lib/content-data";
 import { GetSheetsClient, GetSpreadsheetId } from "@/services/google-sheets";
 
+export const maxDuration = 60;
 
 export async function GET() {
   await connection();
@@ -24,7 +26,15 @@ export async function GET() {
         values: response.data.valueRanges?.[index]?.values ?? [],
       })),
     );
-    return Response.json(data, { headers: { "Cache-Control": "no-store" } });
+    const body = JSON.stringify(data);
+    const compressed = gzipSync(Buffer.from(body));
+    return new Response(compressed, {
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Encoding": "gzip",
+        "Cache-Control": "no-store",
+      },
+    });
   } catch (error) {
     
     const message =
